@@ -52,6 +52,11 @@ pip install -e . --verbose
 ```
 In the repo root directory.
 
+
+### docker environment
+
+since my pc has CUDA-12 which has not yet pytorch support, make an option to start with docker.
+
 ## Getting datasets
 
 <details>
@@ -117,9 +122,12 @@ Usage,
 By default this saves all frames, which is very slow. Add `--no_imsave` to avoid this.
 
 </details>
+
 ## Rendering a spiral
+
 <details>
   <summary>Steps</summary>
+
 Use `opt/render_imgs_circle.py`
 
 Usage,
@@ -127,6 +135,7 @@ Usage,
 `python render_imgs_circle.py <CHECKPOINT.npz> <data_dir>`
 
 </details>
+
 ## Parallel task executor
 
 <details>
