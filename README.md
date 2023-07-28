@@ -84,6 +84,9 @@ python ingp2nsvf.py <ingp_data_dir> <output_data_dir>
 
 ## Optimization
 
+<details>
+  <summary>Steps</summary>
+
 For training a single scene, see `opt/opt.py`. The launch script makes this easier.
 
 Inside `opt/`, run
@@ -98,8 +101,12 @@ The dataset format will be auto-detected from `data_dir`.
 Checkpoints will be in `ckpt/exp_name`.
 
 **For pretrained checkpoints please see:** https://drive.google.com/drive/folders/1SOEJDw8mot7kf5viUK9XryOAmZGe_vvE?usp=sharing
+</details>
 
 ## Evaluation
+
+<details>
+  <summary>Steps</summary>
 
 Use `opt/render_imgs.py`
 
@@ -109,15 +116,17 @@ Usage,
 
 By default this saves all frames, which is very slow. Add `--no_imsave` to avoid this.
 
-
+</details>
 ## Rendering a spiral
-
+<details>
+  <summary>Steps</summary>
 Use `opt/render_imgs_circle.py`
 
 Usage,
 (in opt/)
 `python render_imgs_circle.py <CHECKPOINT.npz> <data_dir>`
 
+</details>
 ## Parallel task executor
 
 <details>

@@ -21,8 +21,8 @@ NOHUP_FILE=$CKPT_DIR/log
 echo CKPT $CKPT_DIR
 echo LOGFILE $NOHUP_FILE
 
-CUDA_VISIBLE_DEVICES=0 python -u opt/opt_colmap.py data/${SESSION_NAME}/colmap \
--t ${CKPT_DIR} -c opt/configs/custom.json --dataset_type colmap
+CUDA_VISIBLE_DEVICES=0 python -u opt_colmap.py ../data/${SESSION_NAME}/colmap \
+-t ${CKPT_DIR} -c configs/custom.json --dataset_type colmap
 echo DETACH
 
 
