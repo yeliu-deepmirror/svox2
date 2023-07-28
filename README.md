@@ -55,7 +55,13 @@ In the repo root directory.
 
 ### docker environment
 
-since my pc has CUDA-12 which has not yet pytorch support, make an option to start with docker.
+since I installed CUDA-12 which does not have pytorch support yet, make an option to start with docker.
+
+```
+bash artifacts/docker/create_docker_image.sh
+bash artifacts/docker/create_docker_container.sh
+bash artifacts/docker/execute_docker_container.sh
+```
 
 ## Getting datasets
 
