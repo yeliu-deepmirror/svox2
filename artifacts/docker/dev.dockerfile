@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 
 SHELL [ "/bin/bash", "--login", "-c" ]
 
@@ -53,8 +53,8 @@ RUN usermod -aG sudo "$USER"
 RUN chown $USER:$GRP /home/$USER
 RUN ls -ad /home/$USER/.??* | xargs chown -R $USER:$GRP
 
-COPY environment.yml /tmp/
-RUN chown $UID:$GID /tmp/environment.yml
+# COPY environment.yml /tmp/
+# RUN chown $UID:$GID /tmp/environment.yml
 
 USER $USER
 
@@ -76,13 +76,13 @@ RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 RUN conda init bash
 
 # build the conda environment
-RUN conda update --name base --channel defaults conda && \
-    conda env create plenoxel --file /tmp/environment.yml --force && \
-    conda clean --all --yes
+# RUN conda update --name base --channel defaults conda && \
+#     conda env create --prefix /home/$USER/env --file /tmp/environment.yml --force && \
+#     conda clean --all --yes
 
 # activate in bash by default
-RUN echo "conda activate plenoxel" >> /home/$USER/.bashrc
+# RUN echo "conda activate /home/$USER/env" >> /home/$USER/.bashrc
 # SHELL ["conda", "run", "-p", "/home/$USER/env", "/bin/bash", "-c"]
 
 # link to jupyter kernal
-# RUN python -m ipykernel install --user --name=plenoxel
+# RUN python -m ipykernel install --user --name=nerf_pl
