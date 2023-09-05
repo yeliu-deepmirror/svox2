@@ -1,13 +1,8 @@
 # Plenoxels: Radiance Fields without Neural Networks
 
-Alex Yu\*, Sara Fridovich-Keil\*, Matthew Tancik, Qinhong Chen, Benjamin Recht, Angjoo Kanazawa
+Alex Yu\*, Sara Fridovich-Keil\*, Matthew Tancik, Qinhong Chen, Benjamin Recht, Angjoo Kanazawa UC Berkeley
 
-UC Berkeley
-
-Website and video: <https://alexyu.net/plenoxels>
-
-arXiv: <https://arxiv.org/abs/2112.05131>
-
+Website and video: <https://alexyu.net/plenoxels>. arXiv: <https://arxiv.org/abs/2112.05131>.
 [Featured at Two Minute Papers YouTube](https://youtu.be/yptwRRpPEBM) 2022-01-11
 
 Despite the name, it's not strictly intended to be a successor of svox
@@ -15,7 +10,7 @@ Despite the name, it's not strictly intended to be a successor of svox
 Citation:
 ```
 @inproceedings{yu2022plenoxels,
-      title={Plenoxels: Radiance Fields without Neural Networks}, 
+      title={Plenoxels: Radiance Fields without Neural Networks},
       author={Sara Fridovich-Keil and Alex Yu and Matthew Tancik and Qinhong Chen and Benjamin Recht and Angjoo Kanazawa},
       year={2022},
       booktitle={CVPR},
@@ -24,11 +19,7 @@ Citation:
 Note that the joint first-authors decided to swap the order of names between arXiv and CVPR proceedings.
 
 This contains the official optimization code.
-A JAX implementation is also available at <https://github.com/sarafridov/plenoxels>. However, note that the JAX version is currently feature-limited, running in about 1 hour per epoch and only supporting bounded scenes (at present). 
-
-![Fast optimization](https://raw.githubusercontent.com/sxyu/svox2/master/github_img/fastopt.gif)
-
-![Overview](https://raw.githubusercontent.com/sxyu/svox2/master/github_img/pipeline.png)
+A JAX implementation is also available at <https://github.com/sarafridov/plenoxels>. However, note that the JAX version is currently feature-limited, running in about 1 hour per epoch and only supporting bounded scenes (at present).
 
 ### Examples use cases
 
@@ -61,13 +52,27 @@ pip install -e . --verbose
 ```
 In the repo root directory.
 
+
+### docker environment
+
+since I installed CUDA-12 which does not have pytorch support yet, make an option to start with docker.
+
+```
+bash artifacts/docker/create_docker_image.sh
+bash artifacts/docker/create_docker_container.sh
+bash artifacts/docker/execute_docker_container.sh
+```
+
 ## Getting datasets
+
+<details>
+  <summary>Steps</summary>
 
 We have backends for NeRF-Blender, LLFF, NSVF, and CO3D dataset formats, and the dataset will be auto-detected.
 
 Please get the NeRF-synthetic and LLFF datasets from:
 <https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1>
-(`nerf_synthetic.zip` and `nerf_llff_data.zip`). 
+(`nerf_synthetic.zip` and `nerf_llff_data.zip`).
 
 We provide a processed Tanks and temples dataset (with background) in NSVF format at:
 <https://drive.google.com/file/d/1PD4oTP4F8jTtpjd_AQjCsL4h8iYFCyvO/view?usp=sharing>
@@ -86,7 +91,12 @@ cd opt/scripts
 python ingp2nsvf.py <ingp_data_dir> <output_data_dir>
 ```
 
+</details>
+
 ## Optimization
+
+<details>
+  <summary>Steps</summary>
 
 For training a single scene, see `opt/opt.py`. The launch script makes this easier.
 
@@ -95,15 +105,19 @@ Inside `opt/`, run
 
 Where `<config>` should be `configs/syn.json` for NeRF-synthetic scenes,
 `configs/llff.json`
-for forward-facing scenes, and 
+for forward-facing scenes, and
 `configs/tnt.json` for tanks and temples scenes, for example.
 
 The dataset format will be auto-detected from `data_dir`.
 Checkpoints will be in `ckpt/exp_name`.
 
 **For pretrained checkpoints please see:** https://drive.google.com/drive/folders/1SOEJDw8mot7kf5viUK9XryOAmZGe_vvE?usp=sharing
+</details>
 
 ## Evaluation
+
+<details>
+  <summary>Steps</summary>
 
 Use `opt/render_imgs.py`
 
@@ -113,8 +127,12 @@ Usage,
 
 By default this saves all frames, which is very slow. Add `--no_imsave` to avoid this.
 
+</details>
 
 ## Rendering a spiral
+
+<details>
+  <summary>Steps</summary>
 
 Use `opt/render_imgs_circle.py`
 
@@ -122,7 +140,12 @@ Usage,
 (in opt/)
 `python render_imgs_circle.py <CHECKPOINT.npz> <data_dir>`
 
+</details>
+
 ## Parallel task executor
+
+<details>
+  <summary>Steps</summary>
 
 We provide a parallel task executor based on the task manager from PlenOctrees to automatically
 schedule many tasks across sets of scenes or hyperparameters.
@@ -145,7 +168,12 @@ For Tanks and Temples scenes
 python autotune.py -g '<space delimited GPU ids>' tasks/eval_tnt.json
 ```
 
+</details>
+
 ## Using a custom image set (360)
+
+<details>
+  <summary>Steps</summary>
 
 Please take images all around the object and try to take images at different elevations.
 First make sure you have colmap installed. Then
@@ -153,7 +181,7 @@ First make sure you have colmap installed. Then
 (in opt/scripts)
 `bash proc_colmap.sh <img_dir> --noradial`
 
-Where `<img_dir>` should be a directory directly containing png/jpg images from a 
+Where `<img_dir>` should be a directory directly containing png/jpg images from a
 normal perspective camera.
 UPDATE: `--noradial` is recommended since otherwise, the script performs undistortion, which seems to not work well and make results blurry.
 Support for the complete OPENCV camera model which has been used by more recent projects would be welcome
@@ -203,6 +231,8 @@ Floaters and poor quality surfaces can be caused by the following reasons
 - Lighting variations. Sometimes the clouds move when capturing outdoors.. Try to capture within a short time frame
 - Motion blur and DoF blur. Try to move slowly and make sure the object is in focus. For small objects, DoF tends to be a substantial issue
 - Image quality. Images may have severe JPEG compression artifacts for example
+
+</details>
 
 ## Potential extensions
 

@@ -2,6 +2,7 @@ from .nerf_dataset import NeRFDataset
 from .llff_dataset import LLFFDataset
 from .nsvf_dataset import NSVFDataset
 from .co3d_dataset import CO3DDataset
+from .colmap_dataset import ColmapDataset
 from os import path
 
 def auto_dataset(root : str, *args, **kwargs):
@@ -24,5 +25,6 @@ datasets = {
     'llff': LLFFDataset,
     'nsvf': NSVFDataset,
     'co3d': CO3DDataset,
-    'auto': auto_dataset
+    'auto': auto_dataset,
+    'colmap': ColmapDataset,
 }
