@@ -43,7 +43,7 @@ parser.add_argument(
 
 # Path adjustment
 parser.add_argument(
-    "--offset", type=str, default="0,0,0", help="Center point to rotate around (only if not --traj)"
+    "--offset", type=str, default=None, help="Center point to rotate around (only if not --traj)"
 )
 parser.add_argument("--radius", type=float, default=0.85, help="Radius of orbit (only if not --traj)")
 parser.add_argument(
@@ -111,8 +111,13 @@ if args.vec_up is None:
 else:
     args.vec_up = np.array(list(map(float, args.vec_up.split(","))))
 
+if args.offset is None:
+    positions = dset.c2w[:, :3, 3].cpu().numpy()
+    args.offset = np.mean(positions, axis=0)
+    print('  Auto offset', args.offset)
+else:
+    args.offset = np.array(list(map(float, args.offset.split(","))))
 
-args.offset = np.array(list(map(float, args.offset.split(","))))
 if args.traj_type == 'spiral':
     angles = np.linspace(-180, 180, args.num_views + 1)[:-1]
     elevations = np.linspace(args.elevation, args.elevation2, args.num_views)
@@ -164,7 +169,7 @@ if args.vert_shift != 0.0:
     render_out_path += f'_vshift{args.vert_shift}'
 
 grid = svox2.SparseGrid.load(args.ckpt, device=device)
-print(grid.center, grid.radius)
+print("center", grid.center, "radius", grid.radius, "num_views", args.num_views)
 
 # DEBUG
 #  grid.background_data.data[:, 32:, -1] = 0.0
@@ -224,8 +229,8 @@ with torch.no_grad():
         h = dset_h if args.crop == 1.0 else int(dset_h * args.crop)
 
         cam = svox2.Camera(c2ws[img_id],
-                           dset.intrins.get('fx', 0),
-                           dset.intrins.get('fy', 0),
+                           dset.intrins.fx,
+                           dset.intrins.fy,
                            w * 0.5,
                            h * 0.5,
                            w, h,
@@ -243,5 +248,3 @@ with torch.no_grad():
     if len(frames):
         vid_path = render_out_path
         imageio.mimwrite(vid_path, frames, fps=args.fps, macro_block_size=8)  # pip install imageio-ffmpeg
-
-

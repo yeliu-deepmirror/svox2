@@ -8,3 +8,4 @@ svox2.egg-info
 .eggs
 nohup.out
 build
+svox2/*.so

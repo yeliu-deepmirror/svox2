@@ -1,10 +1,11 @@
 {
-    "reso": "[[128, 128, 128], [256, 256, 256], [512, 512, 512]]",
-    "scale": 0.25,
+    "reso": "[[64, 64, 64], [128, 128, 128]]",
+    "scale": 0.5,
     "n_iters": 102400,
-    "background_nlayers": 64,
-    "background_reso": 1024,
+    "background_nlayers": 32,
+    "background_reso": 512,
     "cam_scale_factor": 0.9,
+    "batch_size": 4000,
     "upsamp_every": 25600,
     "near_clip": 0.35,
     "lr_sigma": 3e1,
@@ -21,5 +22,7 @@
     "lambda_sparsity": 1e-11,
     "background_brightness": 0.5,
     "tv_early_only": 0,
-    "tv_decay": 0.5
+    "tv_decay": 0.5,
+    "save_every": 2,
+    "eval_every": 2
 }

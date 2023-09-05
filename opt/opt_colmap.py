@@ -385,21 +385,14 @@ while True:
             img_save_interval = (N_IMGS_TO_EVAL // N_IMGS_TO_SAVE)
             img_ids = range(0, dset_test.n_images, img_eval_interval)
 
-            # Special 'very hard' specular + fuzz set
-            #  img_ids = [2, 5, 7, 9, 21,
-            #             44, 45, 47, 49, 56,
-            #             80, 88, 99, 115, 120,
-            #             154]
-            #  img_save_interval = 1
-
             n_images_gen = 0
             for i, img_id in tqdm(enumerate(img_ids), total=len(img_ids)):
                 c2w = dset_test.c2w[img_id].to(device=device)
                 cam = svox2.Camera(c2w,
-                                   dset_test.intrins.get('fx', img_id),
-                                   dset_test.intrins.get('fy', img_id),
-                                   dset_test.intrins.get('cx', img_id),
-                                   dset_test.intrins.get('cy', img_id),
+                                   dset_test.intrins.fx,
+                                   dset_test.intrins.fy,
+                                   dset_test.intrins.cx,
+                                   dset_test.intrins.cy,
                                    width=dset_test.get_image_size(img_id)[1],
                                    height=dset_test.get_image_size(img_id)[0],
                                    ndc_coeffs=dset_test.ndc_coeffs)
@@ -470,6 +463,7 @@ while True:
         # NOTE: we do an eval sanity check, if not in tune_mode
         eval_step()
         gc.collect()
+        torch.cuda.empty_cache()
 
     def train_step():
         print('Train step')
@@ -604,6 +598,8 @@ while True:
 
     train_step()
     gc.collect()
+    torch.cuda.empty_cache()
+
     gstep_id_base += batches_per_epoch
 
     #  ckpt_path = path.join(args.train_dir, f'ckpt_{epoch_id:05d}.npz')
@@ -657,3 +653,4 @@ while True:
         if not args.tune_nosave:
             grid.save(ckpt_path)
         break
+    torch.cuda.empty_cache()
