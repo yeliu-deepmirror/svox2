@@ -159,7 +159,7 @@ class ColmapDataset(ColmapDatasetBase):
         # undistort the image, and remap to the unit camera intrinsics
         new_image = cv2.undistort(
             new_image, camera_matrix, np.array([0, 0, 0, 0, 0]), None, self.picked_camera)
-        new_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
+        # new_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
         return new_image
 
 
