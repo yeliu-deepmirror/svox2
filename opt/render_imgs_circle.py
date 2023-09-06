@@ -118,6 +118,8 @@ if args.offset is None:
 else:
     args.offset = np.array(list(map(float, args.offset.split(","))))
 
+print('  radius', args.radius)
+
 if args.traj_type == 'spiral':
     angles = np.linspace(-180, 180, args.num_views + 1)[:-1]
     elevations = np.linspace(args.elevation, args.elevation2, args.num_views)
@@ -169,7 +171,7 @@ if args.vert_shift != 0.0:
     render_out_path += f'_vshift{args.vert_shift}'
 
 grid = svox2.SparseGrid.load(args.ckpt, device=device)
-print("center", grid.center, "radius", grid.radius, "num_views", args.num_views)
+print("svox2 grid : center", grid.center, "radius", grid.radius, "num_views", args.num_views)
 
 # DEBUG
 #  grid.background_data.data[:, 32:, -1] = 0.0

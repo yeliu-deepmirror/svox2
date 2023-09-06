@@ -95,6 +95,11 @@ python ingp2nsvf.py <ingp_data_dir> <output_data_dir>
 
 ## Optimization
 
+```
+cd opt
+bash proc_colmap.sh
+```
+
 <details>
   <summary>Steps</summary>
 

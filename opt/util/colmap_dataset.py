@@ -150,6 +150,19 @@ class ColmapDataset(ColmapDatasetBase):
     rays: Optional[Rays]
     split: str
 
+    def preprocess_image(self, image, camera_matrix):
+        full_size = list(image.shape[:2])
+        assert full_size[0] > 0 and full_size[1] > 0, "Empty images"
+        rsz_h, rsz_w = [round(hw * self.scale) for hw in full_size]
+        new_image = cv2.resize(image, (rsz_w, rsz_h), interpolation=cv2.INTER_AREA)
+
+        # undistort the image, and remap to the unit camera intrinsics
+        new_image = cv2.undistort(
+            new_image, camera_matrix, np.array([0, 0, 0, 0, 0]), None, self.picked_camera)
+        # new_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
+        return new_image
+
+
     def __init__(
         self,
         root,
@@ -176,11 +189,12 @@ class ColmapDataset(ColmapDatasetBase):
         self.device = device
         self.permutation = permutation
         self.epoch_size = epoch_size
+        self.scale = scale
 
         all_gt = []
         self.pose_rescale_factor = 0.01
 
-        print("LOAD COLMAP DATA", root, ', split:', split, ', scale:', scale)
+        print("LOAD COLMAP DATA", root, ', split:', split, ', scale:', self.scale)
 
         self.split = split
         cameras, images, points3D = read_write_model.read_model(path.join(root, "sparse"))
@@ -201,6 +215,18 @@ class ColmapDataset(ColmapDatasetBase):
             self.image_ids = self.create_train_set(images)
 
         assert len(self.image_ids) > 0, "No images in directory: " + path.join(root, "images")
+
+        # read intrinsics
+        self.camera_matrices = {}
+        for camera_id in cameras:
+            self.camera_matrices[camera_id] = self.scale * read_write_model.get_intrinsics_matrix(cameras[camera_id])
+            self.camera_matrices[camera_id][2, 2] = 1.0
+
+        # pick camera 1 to be intrins_full
+        self.picked_camera = self.camera_matrices[1]
+        self.intrins_full : Intrin = Intrin(self.picked_camera[0, 0], self.picked_camera[1, 1], self.picked_camera[0, 2], self.picked_camera[1, 2])
+        print('  - intrinsics (loaded reso)', self.intrins_full)
+
         print("  - find", len(self.image_ids), 'images')
 
         all_c2w = []
@@ -208,13 +234,8 @@ class ColmapDataset(ColmapDatasetBase):
             img_path = path.join(root, "images", images[image_id].name)
             image = imageio.imread(img_path)
             all_c2w.append(torch.from_numpy(all_img_poses[image_id]))
-            full_size = list(image.shape[:2])
-            assert full_size[0] > 0 and full_size[1] > 0, "Empty images"
-            rsz_h, rsz_w = [round(hw * scale) for hw in full_size]
-
-            if scale < 1:  # dynamic resize
-                image = cv2.resize(image, (rsz_w, rsz_h), interpolation=cv2.INTER_AREA)
-            all_gt.append(torch.from_numpy(image))
+            image_processed = self.preprocess_image(image, self.camera_matrices[images[image_id].camera_id])
+            all_gt.append(torch.from_numpy(image_processed))
 
         self.c2w_f64 = torch.stack(all_c2w)
 
@@ -237,16 +258,6 @@ class ColmapDataset(ColmapDatasetBase):
                 self.gt = self.gt[..., :3]
         self.gt = self.gt.float()
         self.n_images, self.h_full, self.w_full, _ = self.gt.shape
-
-        # read intrinsics
-        self.camera_matrices = {}
-        for camera_id in cameras:
-            self.camera_matrices[camera_id] = scale * read_write_model.get_intrinsics_matrix(cameras[camera_id])
-
-        # pick camera 1 to be intrins_full
-        picked_cam = self.camera_matrices[1]
-        self.intrins_full : Intrin = Intrin(picked_cam[0, 0], picked_cam[1, 1], picked_cam[0, 2], picked_cam[1, 2])
-        print(' intrinsics (loaded reso)', self.intrins_full)
 
         self.scene_scale = scene_scale
         if self.split == "train":
